@@ -1,0 +1,74 @@
+{
+  "name": "opendm",
+  "version": "0.2.0",
+  "description": "Open-source, self-hosted alternative to ManyChat-style Instagram comment-to-DM automation, on Cloudflare Workers.",
+  "license": "AGPL-3.0-only",
+  "author": "SS Enterprises (https://vibemastery.io)",
+  "private": true,
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/charanjit-singh/opendm.git"
+  },
+  "scripts": {
+    "dev": "wrangler dev",
+    "dev:web": "vite",
+    "build:web": "vite build",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p web/tsconfig.json",
+    "pretest": "npm run build:web",
+    "test": "vitest run",
+    "test:e2e": "node e2e/run.mjs",
+    "test:browser": "node e2e/browser.mjs",
+    "test:all": "npm run lint && npm run typecheck && npm run test && npm run test:e2e && npm run test:browser",
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "db:migrate:local": "wrangler d1 migrations apply opendm --local",
+    "db:migrate:remote": "wrangler d1 migrations apply opendm --remote",
+    "cli": "node cli/opendm.ts",
+    "mcp": "node cli/mcp.ts"
+  },
+  "cloudflare": {
+    "label": "OpenDM",
+    "products": [
+      "Workers",
+      "D1"
+    ],
+    "bindings": {
+      "ADMIN_PASSWORD": {
+        "description": "Password for the admin dashboard (/admin). Pick a long one."
+      },
+      "SESSION_SECRET": {
+        "description": "Random string (32+ chars): signs the login cookie and encrypts stored tokens. `openssl rand -hex 32`."
+      },
+      "VERIFY_TOKEN": {
+        "description": "Any string you choose; paste the same value into Meta's webhook 'Verify token' field."
+      }
+    }
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.15",
+    "@cloudflare/vitest-plugin": "^1.4.2",
+    "@cloudflare/workers-types": "^5.20261006.1",
+    "@preact/preset-vite": "^2.10.6",
+    "@types/node": "^26.6.5",
+    "playwright-core": "^1.64.1",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.4",
+    "vitest": "^4.1.0",
+    "wrangler": "^4.151.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "hono": "^4.13.13",
+    "preact": "^11.0.1",
+    "zod": "^4.6.7"
+  },
+  "engines": {
+    "node": ">=22.18"
+  },
+  "bin": {
+    "opendm": "cli/opendm.ts",
+    "opendm-mcp": "cli/mcp.ts"
+  }
+}
